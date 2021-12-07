@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include<stdio.h>
 #include<math.h>
+//https://blog.csdn.net/kiwi_berrys/article/details/111187699
 //第一题
 //假设有两种微生物X和Y，X出生后每隔3分钟分裂一次（数目加倍），Y出生后每隔2分钟分裂一次（数目加倍）。
 //一个新出生的X，半分钟之后吃掉1个Y，且从此开始每隔1分钟吃掉1个Y。已知新出生的X = 10，Y = 89，求60分钟后Y的数目。
@@ -263,36 +264,74 @@
 //二维数组实际上还是一维数组 例第二行第二列的坐标用一维数组表示:行坐标乘上列数加上纵坐标 x[2][2] = x[2*4+2]
 //[x][rank-1-y]表示为一维数组 = [x*rank +rank-1-y]
 //那么y[  ] = x[i] 填空 首先要反向转二维数组 x[i/4][i%4] 然后把x，y分别带入[x*rank +rank-1-y]得到 [(i/4)*rank + rank -1 -i%4]
-#include<stdio.h>
-void rotate(int* x, int rank)
+//#include<stdio.h>
+//void rotate(int* x, int rank)
+//{
+//	//这里是指构造和原矩阵相同大小的数组 
+//	int* y = (int*)malloc(rank * rank * sizeof(int));  // 填空 原填空是int *y=(int*)malloc(___________________); 矩阵16个int大小 这里填16*sizeof(int)也行
+//	int i = 0;
+//	for (i = 0; i < rank * rank; i++)
+//	{
+//		y[(i % 4) * 4 + 3 - i / 4] = x[i];  // 填空 原填空是y[    ] = x[i];
+//	}
+//	for (i = 0; i < rank * rank; i++)
+//	{
+//		x[i] = y[i];
+//	}
+//	free(y);
+//}
+//
+//int main(int argc, char* argv[])
+//{
+//	int x[4][4] = { {1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16} };
+//	int rank = 4;
+//	rotate(&x[0][0], rank);
+//	for (int i = 0; i < rank; i++)
+//	{
+//		for (int j = 0; j < rank; j++)
+//		{
+//			printf("%4d", x[i][j]);
+//		}
+//		printf("\n");
+//	}
+//	return 0;
+//}
+//
+
+//第六题：大数乘法
+//题目描述
+//对于32位字长的机器，大约超过20亿，用int类型就无法表示了，我们可以选择_int64类型，但无论怎样扩展，固定的整数类型总是有表达的极限！
+// 如果对超级大整数进行精确运算呢 ? 一个简单的办法是：仅仅使用现有类型，但是把大整数的运算化解为若干小整数的运算，即所谓“分块法”。
+// 下图表示了分块乘法的原理。
+//可以把大数分成多段（此处为2段）小数，然后用小数的多次运算组合表示一个大数。
+//可以根据int的承载能力规定小块的大小，比如要把int分成2段，则小块可取10000为上限值。注意，小块在进行纵向累加后，需要进行进位校正。
+//以下代码示意了分块乘法的原理（乘数、被乘数都分为2段），请分析代码逻辑，并推测划线处的代码。
+//这题说实话 看不懂但是仿照着其他行可以写出正确代码 不知道(出题人)在想啥
+void bigmul(int x, int y, int r[])//87654321, 12345678, x
 {
-	//这里是指构造和原矩阵相同大小的数组 
-	int* y = (int*)malloc(rank * rank * sizeof(int));  // 填空 原填空是int *y=(int*)malloc(___________________); 矩阵16个int大小 这里填16*sizeof(int)也行
-	int i = 0;
-	for (i = 0; i < rank * rank; i++)
-	{
-		y[(i % 4) * 4 + 3 - i / 4] = x[i];  // 填空 原填空是y[    ] = x[i];
-	}
-	for (i = 0; i < rank * rank; i++)
-	{
-		x[i] = y[i];
-	}
-	free(y);
+	int base = 10000;
+	int x2 = x / base;//87654321/10000 = 8765... 4321
+	int x1 = x % base;//4321
+	int y2 = y / base;//1234
+	int y1 = y % base;//5678
+	int n1 = x1 * y1;//4321*1234
+	int n2 = x1 * y2;//4321*5678
+	int n3 = x2 * y1;//8765*1234
+	int n4 = x2 * y2;//8765*5678
+	r[3] = n1 % base;
+	r[2] = n1 / base + n2 % base + n3 % base;//注意这里的r[2]的图中是r3 r3上面有m1 m2 m3 
+	r[1] = n2 / base + n3 % base + n4 % base; //r[1] = ____________________;  //填空 这里对应的图中的r2 r2上面有m2 m3 m4 仿照上一行填
+	r[0] = n4 / base;
+	r[1] += r[2] / base; //r[1] += ____________________;  //同理仿照最后俩行 找出答案
+	r[2] = r[2] % base;
+	r[0] += r[1] / base;
+	r[1] = r[1] % base;
 }
 
 int main(int argc, char* argv[])
 {
-	int x[4][4] = { {1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16} };
-	int rank = 4;
-	rotate(&x[0][0], rank);
-	for (int i = 0; i < rank; i++)
-	{
-		for (int j = 0; j < rank; j++)
-		{
-			printf("%4d", x[i][j]);
-		}
-		printf("\n");
-	}
+	int x[] = { 0,0,0,0 };
+	bigmul(87654321, 12345678, x);//计算这俩个数相乘
+	printf("%d%d%d%d\n", x[0], x[1], x[2], x[3]);
 	return 0;
 }
-
